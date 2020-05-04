@@ -1,12 +1,15 @@
-let dino, platform, plusTime, minusTime;
+let dino, platform, plusTime, minusTime, hourglass, bad_hourglass;
 let timer = 30;
 const GRAVITY = 1;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+
+  hourglass = new Group();
+
   // create the sprites
   let good_hourglass = loadImage('data/increase_time.png');
-  let bad_hourglass = loadImage('data/decrease_time.png');
+  bad_hourglass = loadImage('data/decrease_time.png');
   // dino
   dino = new Dino(width / 2, 0, 100, 100);
   dino.draw();
@@ -14,12 +17,16 @@ function setup() {
   platform = createSprite(width / 2, height / 2 + 60, width, 5);
   platform.setCollider('rectangle');
   platform.shapeColor = color(0, 0, 0);
-  // increase time
-  plusTime = new Time(good_hourglass, 300, 150);
-  plusTime.draw();
-  // decreae time
-  minusTime = new Time(bad_hourglass, 500, 150);
-  minusTime.draw();
+  // // increase time
+  // plusTime = new Time(good_hourglass, 300, 150);
+  // plusTime.draw();
+  // // decreae time
+  // minusTime = new Time(bad_hourglass, 500, 150);
+  // minusTime.draw();
+
+  let newHourglass = createSprite(-width, height / 2 + 20);
+  newHourglass.addImage(bad_hourglass);
+  hourglass.add(newHourglass);
 }
 
 function draw() {
@@ -35,10 +42,22 @@ function draw() {
 
   background(250);
   dino.animation();
+
+  for (var i = 0; i < hourglass.length; i++) {
+    var g = hourglass[i];
+    //moving all the ghosts y following a sin function (sinusoid)
+    g.position.x += 5;
+    if (g.position.x > width + 10) {
+      g.remove();
+      let newHourglass = createSprite(-width + i * 50, height / 2 + 20);
+      newHourglass.addImage(bad_hourglass);
+      hourglass.push(newHourglass);
+    }
+  }
   dino.sprite.debug = mouseIsPressed;
   platform.debug = mouseIsPressed;
-  plusTime.sprite.debug = mouseIsPressed;
-  minusTime.sprite.debug = mouseIsPressed;
+  // plusTime.sprite.debug = mouseIsPressed;
+  // minusTime.sprite.debug = mouseIsPressed;
   // draw the sprites
   drawSprites();
 }
@@ -92,14 +111,20 @@ class Dino {
 /*
   Time class
 */
-class Time {
-  constructor(image, x, y) {
-    this.image = image;
-    this.x = x;
-    this.y = y;
-    this.sprite = createSprite(this.x, y);
-  }
-  draw() {
-    this.sprite.addImage(this.image);
-  }
-}
+// class Time {
+//   constructor(image, x, y) {
+//     this.image = image;
+//     this.x = x;
+//     this.y = y;
+//     this.sprite = createSprite(this.x, y);
+//   }
+//   draw() {
+//     this.sprite.addImage(this.image);
+//   }
+//   animate() {
+//     this.x += 5;
+//     if (this.sprite.position.x > width + 10) {
+//       this.sprite.remove();
+//     }
+//   }
+// }
