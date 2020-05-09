@@ -6,7 +6,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   hourglass = new Group();
-
+  increaseHourglass = new Group();
   // create the sprites
   let good_hourglass = loadImage('data/increase_time.png');
   bad_hourglass = loadImage('data/decrease_time.png');
@@ -17,16 +17,20 @@ function setup() {
   platform = createSprite(width / 2, height / 2 + 60, width, 5);
   platform.setCollider('rectangle');
   platform.shapeColor = color(0, 0, 0);
-  // // increase time
-  // plusTime = new Time(good_hourglass, 300, 150);
-  // plusTime.draw();
-  // // decreae time
-  // minusTime = new Time(bad_hourglass, 500, 150);
-  // minusTime.draw();
 
-  let newHourglass = createSprite(-width, height / 2 + 20);
-  newHourglass.addImage(bad_hourglass);
-  hourglass.add(newHourglass);
+  for (let i = 0; i < 100; i++) {
+    let newHourglass = createSprite(0 + i * -width, height / 2 + 40);
+    newHourglass.addImage(bad_hourglass);
+    hourglass.add(newHourglass);
+  }
+  for (let i = 0; i < 100; i++) {
+    let newSecondHourglass = createSprite(
+      -width / 2 + i * -width,
+      height / 2 + 40
+    );
+    newSecondHourglass.addImage(good_hourglass);
+    increaseHourglass.add(newSecondHourglass);
+  }
 }
 
 function draw() {
@@ -44,20 +48,21 @@ function draw() {
   dino.animation();
 
   for (var i = 0; i < hourglass.length; i++) {
-    var g = hourglass[i];
-    //moving all the ghosts y following a sin function (sinusoid)
-    g.position.x += 5;
-    if (g.position.x > width + 10) {
-      g.remove();
-      let newHourglass = createSprite(-width + i * 50, height / 2 + 20);
-      newHourglass.addImage(bad_hourglass);
-      hourglass.push(newHourglass);
+    hourglass[i].position.x += 5;
+    // console.log('Number ' + i + ':' + hourglass[i].position.x);
+    if (hourglass[i].position.x > width) {
+      deleted(hourglass[i]);
+    }
+  }
+  for (var i = 0; i < increaseHourglass.length; i++) {
+    increaseHourglass[i].position.x += 5;
+    // console.log('Number ' + i + ':' + hourglass[i].position.x);
+    if (increaseHourglass[i].position.x > width) {
+      deleted(increaseHourglass[i]);
     }
   }
   dino.sprite.debug = mouseIsPressed;
   platform.debug = mouseIsPressed;
-  // plusTime.sprite.debug = mouseIsPressed;
-  // minusTime.sprite.debug = mouseIsPressed;
   // draw the sprites
   drawSprites();
 }
@@ -71,7 +76,9 @@ function keyPressed() {
 
   return false;
 }
-
+function deleted(collected) {
+  collected.remove();
+}
 /*
   Dino class
 */
