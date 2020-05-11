@@ -1,8 +1,19 @@
-let asteroid, dino, platform, plusTime, minusTime, hourglass, ellipseWidth;
+let asteroid,
+  dino,
+  platform,
+  plusTime,
+  minusTime,
+  hourglass,
+  ellipseWidth,
+  myFont;
 let timer = 45;
 let explodeAsteroid = false;
-let stage = 1;
+let stage = 0;
 const GRAVITY = 1;
+
+function preload() {
+  myFont = loadFont('data/8-BITWONDER.ttf');
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -40,9 +51,32 @@ function setup() {
   }
 }
 
+// Text function to make it easier to create text
+function textRef(size, content, x, y, color) {
+  textFont(myFont);
+  textAlign(CENTER);
+  textSize(size);
+  fill(color);
+  text(content, x, y);
+}
+
 function draw() {
-  background(250);
+  background(245);
   switch (stage) {
+    case 0:
+      textRef(32, 'Click to start', width / 2, 40, 0);
+      push();
+      translate(width / 2, height / 2);
+      scale(-1, 1);
+      dino.animation();
+      drawSprites(dino.sprite);
+      pop();
+      rect(0, height / 2 + 60, width, 5);
+
+      if (mouseIsPressed) {
+        stage++;
+      }
+      break;
     case 1:
       if (frameCount % 60 === 0 && timer > 0) {
         // if the frameCount is divisible by 60, then a second has passed.
@@ -52,9 +86,8 @@ function draw() {
         // if the timer reaches 0, go to the next stage.
         stage++;
       }
-      textSize(32);
-      fill(0);
-      text(timer, width / 2, 40);
+
+      textRef(32, timer, width / 2, 40, 0);
       dino.animation();
 
       for (var i = 0; i < hourglass.length; i++) {
@@ -72,14 +105,14 @@ function draw() {
         }
       }
       dino.sprite.overlap(hourglass, (collector, collected) => {
-        //show the animation
+        //reduce the timer
         timer -= 5;
         //collected is the sprite in the group collectibles that triggered
         //the event
         collected.remove();
       });
       dino.sprite.overlap(increaseHourglass, (collector, collected) => {
-        //show the animation
+        //increase the timer
         timer += 2;
         //collected is the sprite in the group collectibles that triggered
         //the event
@@ -92,7 +125,7 @@ function draw() {
       drawSprites();
       break;
     case 2:
-      background(255);
+      background(245);
       dino.animation();
 
       dino.sprite.changeAnimation('dying');
@@ -123,13 +156,12 @@ function draw() {
       }
       break;
     default:
-      //Text syling
-      textSize(32);
-      textAlign(CENTER);
       background(50);
-      fill(0);
-      text('The internet is back on.', width / 2, 90);
-      text('Play again?', width / 2, 140);
+      //Text syling
+
+      textRef(32, 'The internet is back on', width / 2, 90, 255);
+      textRef(32, 'Click to play again', width / 2, 140, 255);
+
       // When mouse is pressed, the program restarts
       if (mouseIsPressed) {
         window.location.reload(false);
