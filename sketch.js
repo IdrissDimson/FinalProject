@@ -1,10 +1,12 @@
-let asteroid, dino, platform, plusTime, minusTime, hourglass;
-let timer = 10;
-let stage = 2;
+let asteroid, dino, platform, plusTime, minusTime, hourglass, ellipseWidth;
+let timer = 45;
+let explodeAsteroid = false;
+let stage = 1;
 const GRAVITY = 1;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  ellipseWidth = 50;
 
   hourglass = new Group();
   increaseHourglass = new Group();
@@ -20,7 +22,7 @@ function setup() {
   platform.setCollider('rectangle');
   platform.shapeColor = color(0, 0, 0);
   // asteroid
-  asteroid = createSprite(width - 100, 50, 100, 100);
+  asteroid = createSprite(width - 100, -80, 100, 100);
   asteroid.addImage(asteroidImg);
   asteroid.scale = 0.25;
   for (let i = 0; i < 100; i++) {
@@ -92,15 +94,46 @@ function draw() {
     case 2:
       background(255);
       dino.animation();
-      // dino.sprite.scale = 3;
+
       dino.sprite.changeAnimation('dying');
       dino.sprite.position.x = width / 2;
       dino.sprite.position.y = height / 2;
+
       hourglass.removeSprites();
       increaseHourglass.removeSprites();
+
+      asteroid.position.x -= 8;
+      asteroid.position.y += 5;
+
+      dino.sprite.overlap(asteroid, (collector, collected) => {
+        //show the animation
+        explodeAsteroid = true;
+        //collected is the sprite in the group collectibles that triggered
+        //the event
+        collected.remove();
+      });
       drawSprites();
+      if (explodeAsteroid === true) {
+        ellipseWidth += 5;
+        fill(50);
+        ellipse(width / 2, height / 2, ellipseWidth, ellipseWidth);
+      }
+      if (ellipseWidth > width) {
+        stage++;
+      }
       break;
     default:
+      //Text syling
+      textSize(32);
+      textAlign(CENTER);
+      background(50);
+      fill(0);
+      text('The internet is back on.', width / 2, 90);
+      text('Play again?', width / 2, 140);
+      // When mouse is pressed, the program restarts
+      if (mouseIsPressed) {
+        window.location.reload(false);
+      }
       break;
   }
 }
